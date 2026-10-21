@@ -5,9 +5,7 @@ import '../services/auth_service.dart';
 import '../widgets/server_config_dialog.dart';
 import 'register_screen.dart';
 import 'face_auth_screen.dart';
-import 'admin_dashboard_screen.dart';
-import 'lecturer_dashboard_screen.dart';
-import 'student_dashboard_screen.dart';
+import 'main_navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -31,18 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _navigateToRoleDashboard(UserModel user) {
     AuthService.instance.setCurrentUser(user);
-    Widget nextScreen;
-    if (user.isAdmin) {
-      nextScreen = const AdminDashboardScreen();
-    } else if (user.isLecturer) {
-      nextScreen = const LecturerDashboardScreen();
-    } else {
-      nextScreen = const StudentDashboardScreen();
-    }
-
+    int initialTab = user.isAdmin ? 3 : (user.isLecturer ? 1 : 0);
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => nextScreen),
+      MaterialPageRoute(builder: (_) => MainNavigationScreen(initialTab: initialTab)),
     );
   }
 
@@ -211,7 +201,43 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+
+              // NÚT TRẢI NGHIỆM TRỰC TIẾP TOÀN BỘ ỨNG DỤNG
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal.shade700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                ),
+                icon: const Icon(Icons.rocket_launch_rounded),
+                label: const Text('KHÁM PHÁ TOÀN BỘ APP (1-CHẠM)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  _navigateToRoleDashboard(UserModel(
+                    id: 1,
+                    username: 'sv_dang',
+                    email: 'dang.thc@diemdanh.local',
+                    fullName: 'Trần Hoàng Công Đăng',
+                    role: 'SINH_VIEN',
+                    mssv: '2380614670',
+                  ));
+                },
+              ),
+              const SizedBox(height: 16),
+
+              const Row(
+                children: [
+                  Expanded(child: Divider()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text('HOẶC ĐĂNG NHẬP OTP 2 BƯỚC', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+                  ),
+                  Expanded(child: Divider()),
+                ],
+              ),
+              const SizedBox(height: 16),
 
               // BƯỚC 1: NHẬP TÊN ĐĂNG NHẬP & MẬT KHẨU
               if (!_showOtpStep) ...[
