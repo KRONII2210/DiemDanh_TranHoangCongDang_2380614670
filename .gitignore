@@ -1,0 +1,22 @@
+# Visual Studio / .NET
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Flutter / Dart
+diemdanh_tranhoangcongdang_2380614670/.dart_tool/
+diemdanh_tranhoangcongdang_2380614670/build/
+diemdanh_tranhoangcongdang_2380614670/.flutter-plugins
+diemdanh_tranhoangcongdang_2380614670/.flutter-plugins-dependencies
+
+# Android Studio
+diemdanh_tranhoangcongdang_2380614670/.idea/workspace.xml
+diemdanh_tranhoangcongdang_2380614670/.idea/caches/
+
+# Windows
+Thumbs.db
+Desktop.ini
