@@ -5,7 +5,9 @@ import '../services/auth_service.dart';
 import '../widgets/server_config_dialog.dart';
 import 'register_screen.dart';
 import 'face_auth_screen.dart';
-import 'main_navigation_screen.dart';
+import 'admin_dashboard_screen.dart';
+import 'lecturer_dashboard_screen.dart';
+import 'student_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -29,10 +31,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _navigateToRoleDashboard(UserModel user) {
     AuthService.instance.setCurrentUser(user);
-    int initialTab = user.isAdmin ? 3 : (user.isLecturer ? 1 : 0);
+    Widget nextScreen;
+    if (user.isAdmin) {
+      nextScreen = const AdminDashboardScreen();
+    } else if (user.isLecturer) {
+      nextScreen = const LecturerDashboardScreen();
+    } else {
+      nextScreen = const StudentDashboardScreen();
+    }
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => MainNavigationScreen(initialTab: initialTab)),
+      MaterialPageRoute(builder: (_) => nextScreen),
     );
   }
 
@@ -213,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   elevation: 2,
                 ),
                 icon: const Icon(Icons.rocket_launch_rounded),
-                label: const Text('KHÁM PHÁ TOÀN BỘ APP (1-CHẠM)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                label: const Text('VÀO THẲNG DASHBOARD SINH VIÊN (1-CHẠM)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                 onPressed: () {
                   _navigateToRoleDashboard(UserModel(
                     id: 1,

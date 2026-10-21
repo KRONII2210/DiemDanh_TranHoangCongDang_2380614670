@@ -1,6 +1,7 @@
 @echo off
 chcp 65001 > nul
-set "PATH=D:\flutter_windows_3.24.4-stable\flutter\bin;%PATH%"
+set "JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot"
+set "PATH=%JAVA_HOME%\bin;D:\flutter_windows_3.24.4-stable\flutter\bin;%PATH%"
 title APP FLUTTER - TRAN HOANG CONG DANG 2380614670
 echo =====================================================================
 echo 📱 KHỞI CHẠY APP FLUTTER ĐIỂM DANH SINH VIÊN
