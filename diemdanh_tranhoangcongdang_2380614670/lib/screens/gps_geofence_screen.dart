@@ -75,7 +75,7 @@ class _GpsGeofenceScreenState extends State<GpsGeofenceScreen> {
     setState(() => _isSubmitting = true);
     final user = AuthService.instance.currentUser;
 
-    final res = await ApiService.instance.markAttendanceWithQrAndLocation(
+    await ApiService.instance.markAttendanceWithQrAndLocation(
       buoiHocId: 1,
       sinhVienId: user?.id ?? 1,
       qrToken: 'GPS-DIRECT-CHECKIN',

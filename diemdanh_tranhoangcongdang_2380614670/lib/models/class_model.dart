@@ -1,10 +1,10 @@
 class ClassModel {
-  final int id;
-  final String maLop;
-  final String tenLop;
-  final String hocKy;
-  final String monHoc;
-  final String giangVien;
+  int id;
+  String maLop;
+  String tenLop;
+  String hocKy;
+  String monHoc;
+  String giangVien;
 
   ClassModel({
     required this.id,

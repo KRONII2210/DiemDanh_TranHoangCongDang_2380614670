@@ -165,7 +165,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                         ),
                         const SizedBox(height: 6),
                         const Text(
-                          'Quy định: Vắng $\\ge$ 20% tổng số buổi sẽ bị cấm thi. Hệ thống tự động tính toán số buổi vắng và cho phép nộp đơn có minh chứng để chuyển sang Vắng có phép.',
+                          'Quy định: Vắng từ 20% trở lên (>= 20% tổng số buổi) sẽ bị cấm thi. Hệ thống tự động tính toán số buổi vắng và cho phép nộp đơn có minh chứng để chuyển sang Vắng có phép.',
                           style: TextStyle(fontSize: 12),
                         ),
                       ],

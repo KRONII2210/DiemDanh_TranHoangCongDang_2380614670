@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import '../models/user_model.dart';
 import '../models/class_model.dart';
 import '../models/student_model.dart';
 import '../models/session_model.dart';
@@ -277,7 +276,6 @@ class ApiService {
       'role': resolvedRole,
       'mssv': mssv ?? '2380614670',
     };
-  }
   }
 
   /// Đăng nhập bằng khuôn mặt Face ID (Chức năng 5a)

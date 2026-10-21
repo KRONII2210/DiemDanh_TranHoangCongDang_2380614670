@@ -1,12 +1,12 @@
 import 'class_model.dart';
 
 class SessionModel {
-  final int id;
-  final String tenBuoiHoc;
-  final String ngayHoc;
-  final String tietHoc;
-  final String phongHoc;
-  final ClassModel? lopHoc;
+  int id;
+  String tenBuoiHoc;
+  String ngayHoc;
+  String tietHoc;
+  String phongHoc;
+  ClassModel? lopHoc;
 
   SessionModel({
     required this.id,

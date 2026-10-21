@@ -99,7 +99,7 @@ class AboutScreen extends StatelessWidget {
             _buildRubricItem(
               number: '6',
               title: 'Tính năng mới tự đề xuất (1.0đ)',
-              desc: 'Hệ thống AI tự động cảnh báo nguy cơ cấm thi khi vắng $\\ge$ 20% và cho phép nộp đơn xin nghỉ phép kèm minh chứng y tế trực tuyến.',
+              desc: 'Hệ thống AI tự động cảnh báo nguy cơ cấm thi khi vắng từ 20% trở lên (>= 20%) và cho phép nộp đơn xin nghỉ phép kèm minh chứng y tế trực tuyến.',
               status: 'HOÀN THÀNH',
               color: Colors.purple,
             ),

@@ -1,14 +1,14 @@
 import 'class_model.dart';
 
 class StudentModel {
-  final int id;
-  final String mssv;
-  final String hoTen;
-  final String gioiTinh;
-  final String? ngaySinh;
-  final String? email;
-  final String? soDienThoai;
-  final ClassModel? lopHoc;
+  int id;
+  String mssv;
+  String hoTen;
+  String gioiTinh;
+  String? ngaySinh;
+  String? email;
+  String? soDienThoai;
+  ClassModel? lopHoc;
 
   StudentModel({
     required this.id,

@@ -198,9 +198,26 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                         _buildFeatureCard(
                           icon: Icons.face_retouching_natural,
                           color: Colors.purple.shade700,
-                          title: 'Face ID Login',
-                          subtitle: 'Khuôn mặt sinh viên (5a)',
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FaceAuthScreen())),
+                          title: 'Face ID',
+                          subtitle: 'Xác thực khuôn mặt (5a)',
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => FaceAuthScreen(
+                                studentName: fullName,
+                                mssv: mssv,
+                                onVerified: () {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Xác thực khuôn mặt Face ID thành công!'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                         _buildFeatureCard(
                           icon: Icons.assignment_turned_in,
