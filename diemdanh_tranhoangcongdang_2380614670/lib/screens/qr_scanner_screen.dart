@@ -1,5 +1,6 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../models/session_model.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
@@ -13,20 +14,28 @@ class QrScannerScreen extends StatefulWidget {
 }
 
 class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _animController;
+  late AnimationController _laserAnimController;
   final TextEditingController _manualCodeController = TextEditingController(text: 'TSV-1-K7X9A2');
+  final MobileScannerController _cameraController = MobileScannerController(
+    detectionSpeed: DetectionSpeed.normal,
+    facing: CameraFacing.back,
+    torchEnabled: false,
+  );
+
   bool _isProcessing = false;
+  bool _hasScanned = false;
+  bool _isTorchOn = false;
 
   @override
   void initState() {
     super.initState();
     _manualCodeController.text = ApiService.instance.currentDynamicQrCode;
-    _animController = AnimationController(
+    _laserAnimController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1800),
     )..repeat(reverse: true);
 
-    // Tự động đồng bộ mã QR mới nhất do Giảng viên phát từ PC
+    // Tự động đồng bộ mã QR mới nhất do Giảng viên phát từ Server
     ApiService.instance.fetchActiveQrToken().then((latest) {
       if (mounted) {
         setState(() {
@@ -38,19 +47,55 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
 
   @override
   void dispose() {
-    _animController.dispose();
+    _laserAnimController.dispose();
+    _cameraController.dispose();
     _manualCodeController.dispose();
     super.dispose();
   }
 
-  Future<void> _processScan(String qrContent) async {
+  void _onDetect(BarcodeCapture capture) {
+    if (_isProcessing || _hasScanned) return;
+
+    for (final barcode in capture.barcodes) {
+      final String? rawValue = barcode.rawValue;
+      if (rawValue != null && rawValue.trim().isNotEmpty) {
+        _handleDetectedCode(rawValue.trim());
+        break;
+      }
+    }
+  }
+
+  void _handleDetectedCode(String rawData) {
+    if (_isProcessing || _hasScanned) return;
+    setState(() => _hasScanned = true);
+
+    String token = rawData;
+    int buoiId = widget.session?.id ?? 1;
+
+    // Hỗ trợ định dạng mã QR đầy đủ "DIEMDANH:<buoiId>:<token>" hoặc mã token độc lập "TSV-..."
+    if (rawData.startsWith('DIEMDANH:')) {
+      final parts = rawData.split(':');
+      if (parts.length >= 2) {
+        final parsed = int.tryParse(parts[1]);
+        if (parsed != null) buoiId = parsed;
+      }
+      if (parts.length >= 3) {
+        token = parts[2];
+      }
+    }
+
+    _manualCodeController.text = token;
+    _processScan(token, buoiHocId: buoiId);
+  }
+
+  Future<void> _processScan(String qrContent, {int? buoiHocId}) async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
     final user = AuthService.instance.currentUser;
-    final int buoiId = widget.session?.id ?? 1;
+    final int buoiId = buoiHocId ?? widget.session?.id ?? 1;
 
-    // Simulate GPS coordinates (10.8221, 106.6882) - campus location
+    // Tọa độ GPS mô phỏng (10.8221, 106.6882) - Bán kính khuôn viên trường
     final result = await ApiService.instance.markAttendanceWithQrAndLocation(
       buoiHocId: buoiId,
       sinhVienId: user?.id ?? 1,
@@ -108,8 +153,17 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
         ),
       );
     } else {
+      setState(() => _hasScanned = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? 'Lỗi điểm danh'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(result['message'] ?? 'Lỗi điểm danh'),
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: 'Thử lại',
+            textColor: Colors.white,
+            onPressed: () => setState(() => _hasScanned = false),
+          ),
+        ),
       );
     }
   }
@@ -130,6 +184,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
   void _showQrCodeDialog() async {
     final activeCode = await ApiService.instance.fetchActiveQrToken();
     if (!mounted) return;
+    final int buoiId = widget.session?.id ?? 1;
+    final String fullQrData = 'DIEMDANH:$buoiId:$activeCode';
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -138,16 +195,16 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
           children: [
             Icon(Icons.qr_code_2, color: Colors.blue),
             SizedBox(width: 8),
-            Text('Mã QR Của Buổi Học', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('Mã QR Chuẩn Của Buổi Học', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Lớp: LTDD01 - Lập trình di động\nBuổi học: Buổi 1 (Mã đổi mỗi 30s)',
+            Text(
+              'Lớp: LTDD01 - Lập trình di động\nBuổi học: Buổi $buoiId (Mã đổi mỗi 30s)',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: Colors.black87),
+              style: const TextStyle(fontSize: 12, color: Colors.black87),
             ),
             const SizedBox(height: 12),
             Container(
@@ -161,10 +218,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                 ],
               ),
               child: SizedBox(
-                width: 170,
-                height: 170,
-                child: CustomPaint(
-                  painter: _QrMatrixPainter(seedString: 'DIEMDANH:1:$activeCode'),
+                width: 180,
+                height: 180,
+                child: QrImageView(
+                  data: fullQrData,
+                  version: QrVersions.auto,
+                  size: 180.0,
+                  backgroundColor: Colors.white,
                 ),
               ),
             ),
@@ -212,6 +272,19 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            icon: Icon(_isTorchOn ? Icons.flash_on : Icons.flash_off),
+            tooltip: 'Bật/Tắt Đèn Flash',
+            onPressed: () async {
+              await _cameraController.toggleTorch();
+              setState(() => _isTorchOn = !_isTorchOn);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.flip_camera_ios),
+            tooltip: 'Đổi Camera Trước/Sau',
+            onPressed: () => _cameraController.switchCamera(),
+          ),
+          IconButton(
             icon: const Icon(Icons.qr_code_2),
             tooltip: 'Xem mã QR buổi học (Dành cho kiểm thử 1 máy)',
             onPressed: _showQrCodeDialog,
@@ -221,53 +294,32 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Camera viewfinder simulation
-            Container(
+            // Khung Camera Thật Quét Mã QR Thời Gian Thực
+            SizedBox(
               height: 320,
               width: double.infinity,
-              color: Colors.black,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Camera background feed simulation
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        colors: [Colors.grey.shade900, Colors.black],
-                        radius: 0.9,
-                      ),
-                    ),
-                  ),
-
-                  // Viewfinder Frame
-                  Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue.shade400, width: 2),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-
-                  // Animated Scanning Laser Line
-                  AnimatedBuilder(
-                    animation: _animController,
-                    builder: (context, child) {
-                      return Positioned(
-                        top: 50 + (_animController.value * 220),
-                        child: Container(
-                          width: 210,
-                          height: 3,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.blueAccent.withOpacity(0.0),
-                                Colors.cyanAccent,
-                                Colors.blueAccent.withOpacity(0.0),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(color: Colors.cyanAccent.withOpacity(0.8), blurRadius: 6),
+                  // Luồng Camera Thật sử dụng MobileScanner
+                  MobileScanner(
+                    controller: _cameraController,
+                    onDetect: _onDetect,
+                    errorBuilder: (context, error, child) {
+                      return Container(
+                        color: Colors.black87,
+                        padding: const EdgeInsets.all(20),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.camera_alt_outlined, color: Colors.white54, size: 48),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Không thể khởi động Camera (${error.errorCode.name})\nVui lòng cấp quyền Camera hoặc dùng nút kiểm thử bên dưới.',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.white70, fontSize: 12),
+                              ),
                             ],
                           ),
                         ),
@@ -275,20 +327,59 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                     },
                   ),
 
-                  // Guidance text
+                  // Khung ngắm Viewfinder
+                  Container(
+                    width: 230,
+                    height: 230,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.cyanAccent, width: 2.5),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10),
+                      ],
+                    ),
+                  ),
+
+                  // Tia quét Laser chuyển động
+                  AnimatedBuilder(
+                    animation: _laserAnimController,
+                    builder: (context, child) {
+                      return Positioned(
+                        top: 45 + (_laserAnimController.value * 225),
+                        child: Container(
+                          width: 220,
+                          height: 3,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.cyanAccent.withOpacity(0.0),
+                                Colors.cyanAccent,
+                                Colors.cyanAccent.withOpacity(0.0),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(color: Colors.cyanAccent.withOpacity(0.9), blurRadius: 8),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  // Dòng hướng dẫn người dùng
                   Positioned(
-                    bottom: 20,
+                    bottom: 12,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(20)),
-                      child: const Text('Hướng camera vào mã QR của Giảng viên', style: TextStyle(color: Colors.white, fontSize: 12)),
+                      decoration: BoxDecoration(color: Colors.black.withOpacity(0.65), borderRadius: BorderRadius.circular(20)),
+                      child: const Text('Hướng camera vào mã QR của Giảng viên để tự động điểm danh', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Controls & Test Options
+            // Các chức năng kiểm thử & Nhập mã thủ công
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -357,17 +448,17 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                         ),
                         child: const Text('Xác nhận'),
                         onPressed: _isProcessing
-                        ? null
-                        : () {
-                            final code = _manualCodeController.text.trim();
-                            if (code.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Vui lòng nhập mã QR của buổi học!')),
-                              );
-                              return;
-                            }
-                            _processScan(code);
-                          },
+                            ? null
+                            : () {
+                                final code = _manualCodeController.text.trim();
+                                if (code.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Vui lòng nhập mã QR của buổi học!')),
+                                  );
+                                  return;
+                                }
+                                _processScan(code);
+                              },
                       ),
                     ],
                   ),
@@ -385,7 +476,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                       children: [
                         Text('QUY TRÌNH XÁC THỰC 3 LỚP AN TOÀN:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.blue)),
                         SizedBox(height: 4),
-                        Text('1. Nhận diện QR Code bảo mật thời gian thực', style: TextStyle(fontSize: 12)),
+                        Text('1. Nhận diện QR Code bảo mật thời gian thực bằng Camera', style: TextStyle(fontSize: 12)),
                         Text('2. Đối soát tọa độ GPS trong bán kính phòng học', style: TextStyle(fontSize: 12)),
                         Text('3. Xác thực danh tính sinh viên Trần Hoàng Công Đăng - 2380614670', style: TextStyle(fontSize: 12)),
                       ],
@@ -399,62 +490,4 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
       ),
     );
   }
-}
-
-class _QrMatrixPainter extends CustomPainter {
-  final String seedString;
-  _QrMatrixPainter({required this.seedString});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paintDark = Paint()..color = const Color(0xFF1A237E);
-    final paintFinder = Paint()..color = const Color(0xFF0D47A1);
-
-    const int grid = 25;
-    final cellSize = size.width / grid;
-
-    void drawFinder(double x, double y) {
-      canvas.drawRect(Rect.fromLTWH(x * cellSize, y * cellSize, 7 * cellSize, 7 * cellSize), paintFinder);
-      canvas.drawRect(
-        Rect.fromLTWH((x + 1) * cellSize, (y + 1) * cellSize, 5 * cellSize, 5 * cellSize),
-        Paint()..color = Colors.white,
-      );
-      canvas.drawRect(Rect.fromLTWH((x + 2) * cellSize, (y + 2) * cellSize, 3 * cellSize, 3 * cellSize), paintFinder);
-    }
-
-    drawFinder(1, 1);
-    drawFinder(grid - 8.0, 1);
-    drawFinder(1, grid - 8.0);
-
-    int hash = seedString.hashCode;
-    final rand = Random(hash.abs());
-
-    for (int r = 0; r < grid; r++) {
-      for (int c = 0; c < grid; c++) {
-        if ((r < 9 && c < 9) || (r < 9 && c >= grid - 9) || (r >= grid - 9 && c < 9)) {
-          continue;
-        }
-
-        if (r == 6 || c == 6) {
-          if ((r + c) % 2 == 0) {
-            canvas.drawRect(Rect.fromLTWH(c * cellSize, r * cellSize, cellSize, cellSize), paintDark);
-          }
-          continue;
-        }
-
-        if (rand.nextBool()) {
-          canvas.drawRRect(
-            RRect.fromRectAndRadius(
-              Rect.fromLTWH(c * cellSize + 0.5, r * cellSize + 0.5, cellSize - 1, cellSize - 1),
-              const Radius.circular(1.5),
-            ),
-            paintDark,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _QrMatrixPainter oldDelegate) => oldDelegate.seedString != seedString;
 }

@@ -113,7 +113,7 @@ namespace DiemDanh_TranHoangCongDang_2380614670_API.Services
         <div class=""subtitle"">Môn: LTDD01 - Lập trình di động | Buổi 1: Giới thiệu Flutter UI</div>
 
         <div class=""qr-box"">
-            <canvas id=""qr-canvas"" width=""240"" height=""240""></canvas>
+            <div id=""qr-container"" style=""display: flex; justify-content: center; align-items: center; width: 240px; height: 240px;""></div>
         </div>
 
         <div class=""token-display"" id=""token-text"">TSV-1-K7X9A2</div>
@@ -131,10 +131,23 @@ namespace DiemDanh_TranHoangCongDang_2380614670_API.Services
         </div>
     </div>
 
+    <script src=""/qrcode.min.js""></script>
     <script>
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let seconds = 30;
         let currentToken = 'TSV-1-K7X9A2';
+
+        async function syncTokenToServer(token) {
+            try {
+                await fetch('/api/Attendance/set-qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token })
+                });
+            } catch (e) {
+                console.log('Chua ket noi API hoac dang offline');
+            }
+        }
 
         function generateToken() {
             let code = '';
@@ -144,58 +157,24 @@ namespace DiemDanh_TranHoangCongDang_2380614670_API.Services
             currentToken = 'TSV-1-' + code;
             document.getElementById('token-text').textContent = currentToken;
             drawQR('DIEMDANH:1:' + currentToken);
+            syncTokenToServer(currentToken);
         }
 
+        let qrcodeObj = null;
         function drawQR(data) {
-            const canvas = document.getElementById('qr-canvas');
-            const ctx = canvas.getContext('2d');
-            const size = 240;
-            const grid = 25;
-            const cellSize = size / grid;
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, size, size);
-
-            function drawFinder(x, y) {
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect(x * cellSize, y * cellSize, 7 * cellSize, 7 * cellSize);
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect((x + 1) * cellSize, (y + 1) * cellSize, 5 * cellSize, 5 * cellSize);
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect((x + 2) * cellSize, (y + 2) * cellSize, 3 * cellSize, 3 * cellSize);
-            }
-
-            drawFinder(1, 1);
-            drawFinder(grid - 8, 1);
-            drawFinder(1, grid - 8);
-
-            // Pseudo-random data dots based on string
-            let hash = 0;
-            for (let i = 0; i < data.length; i++) {
-                hash = ((hash << 5) - hash) + data.charCodeAt(i);
-                hash |= 0;
-            }
-
-            let seed = Math.abs(hash);
-            function nextRandom() {
-                seed = (seed * 9301 + 49297) % 233280;
-                return seed / 233280;
-            }
-
-            ctx.fillStyle = '#0f172a';
-            for (let r = 0; r < grid; r++) {
-                for (let c = 0; c < grid; c++) {
-                    if ((r < 9 && c < 9) || (r < 9 && c >= grid - 9) || (r >= grid - 9 && c < 9)) continue;
-                    if (r === 6 || c === 6) {
-                        if ((r + c) % 2 === 0) ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
-                        continue;
-                    }
-                    if (nextRandom() > 0.5) {
-                        ctx.beginPath();
-                        ctx.roundRect(c * cellSize + 0.5, r * cellSize + 0.5, cellSize - 1, cellSize - 1, 1.5);
-                        ctx.fill();
-                    }
-                }
+            const container = document.getElementById('qr-container');
+            container.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                qrcodeObj = new QRCode(container, {
+                    text: data,
+                    width: 240,
+                    height: 240,
+                    colorDark: '#0f172a',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } else {
+                container.innerHTML = '<div style=""color:black; font-weight:bold; font-size:13px; text-align:center;"">DIEMDANH:1:' + currentToken + '</div>';
             }
         }
 

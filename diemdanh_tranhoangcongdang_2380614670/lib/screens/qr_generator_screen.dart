@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../models/session_model.dart';
 import '../services/api_service.dart';
 
@@ -113,12 +114,23 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
               ),
               child: Column(
                 children: [
-                  // QR Matrix Visualizer
+                  // QR Matrix Chuẩn Quốc Tế ISO (Máy quét camera nhận diện ngay)
                   SizedBox(
                     width: 240,
                     height: 240,
-                    child: CustomPaint(
-                      painter: _QrMatrixPainter(seedString: qrData),
+                    child: QrImageView(
+                      data: qrData,
+                      version: QrVersions.auto,
+                      size: 240.0,
+                      backgroundColor: Colors.white,
+                      eyeStyle: const QrEyeStyle(
+                        eyeShape: QrEyeShape.square,
+                        color: Color(0xFF0D47A1),
+                      ),
+                      dataModuleStyle: const QrDataModuleStyle(
+                        dataModuleShape: QrDataModuleShape.square,
+                        color: Color(0xFF1A237E),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -221,67 +233,4 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
   }
 }
 
-class _QrMatrixPainter extends CustomPainter {
-  final String seedString;
-  _QrMatrixPainter({required this.seedString});
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paintDark = Paint()..color = const Color(0xFF1A237E); // Dark Navy
-    final paintFinder = Paint()..color = const Color(0xFF0D47A1);
-
-    const int grid = 25;
-    final cellSize = size.width / grid;
-
-    // Draw 3 Corner Finder Patterns
-    void drawFinder(double x, double y) {
-      // Outer 7x7
-      canvas.drawRect(Rect.fromLTWH(x * cellSize, y * cellSize, 7 * cellSize, 7 * cellSize), paintFinder);
-      // Inner 5x5 white
-      canvas.drawRect(
-        Rect.fromLTWH((x + 1) * cellSize, (y + 1) * cellSize, 5 * cellSize, 5 * cellSize),
-        Paint()..color = Colors.white,
-      );
-      // Center 3x3
-      canvas.drawRect(Rect.fromLTWH((x + 2) * cellSize, (y + 2) * cellSize, 3 * cellSize, 3 * cellSize), paintFinder);
-    }
-
-    drawFinder(1, 1);
-    drawFinder(grid - 8.0, 1);
-    drawFinder(1, grid - 8.0);
-
-    // Pseudorandom grid based on seed string hash
-    int hash = seedString.hashCode;
-    final rand = Random(hash.abs());
-
-    for (int r = 0; r < grid; r++) {
-      for (int c = 0; c < grid; c++) {
-        // Skip finder pattern zones
-        if ((r < 9 && c < 9) || (r < 9 && c >= grid - 9) || (r >= grid - 9 && c < 9)) {
-          continue;
-        }
-
-        // Timing patterns
-        if (r == 6 || c == 6) {
-          if ((r + c) % 2 == 0) {
-            canvas.drawRect(Rect.fromLTWH(c * cellSize, r * cellSize, cellSize, cellSize), paintDark);
-          }
-          continue;
-        }
-
-        if (rand.nextBool()) {
-          canvas.drawRRect(
-            RRect.fromRectAndRadius(
-              Rect.fromLTWH(c * cellSize + 0.5, r * cellSize + 0.5, cellSize - 1, cellSize - 1),
-              const Radius.circular(1.5),
-            ),
-            paintDark,
-          );
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _QrMatrixPainter oldDelegate) => oldDelegate.seedString != seedString;
-}
