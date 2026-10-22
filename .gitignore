@@ -32,3 +32,10 @@ diemdanh_tranhoangcongdang_2380614670/.flutter-plugins-dependencies
 Thumbs.db
 Desktop.ini
 
+# Compressed Archives
+*.rar
+*.zip
+*.7z
+*.tar.gz
+
+
