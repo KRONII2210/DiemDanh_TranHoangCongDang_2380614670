@@ -71,3 +71,6 @@ DiemDanh_TranHoangCongDang_2380614670/
 | **Quản trị viên (Admin)** | `admin@tsv.edu.vn` | `Admin@123456` | Quản trị tài khoản, phân quyền, duyệt đơn nghỉ phép |
 | **Giảng viên (Teacher)** | `giangvien@tsv.edu.vn` | `Gv@123456` | Quản lý lớp, phát mã QR điểm danh động, xem thống kê |
 | **Sinh viên (Student)** | `congdang@tsv.edu.vn` | `Sv@123456` | Quét QR bằng camera, nhận diện vị trí, gửi đơn xin nghỉ |
+
+## 6.  Chấm Điểm Bản Thân
+Sau khi kiểm thử và xem xét thì bản thân em chấm 7/10đ
