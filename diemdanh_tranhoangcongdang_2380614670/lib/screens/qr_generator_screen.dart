@@ -41,7 +41,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
     final chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     final code = List.generate(6, (_) => chars[rand.nextInt(chars.length)]).join();
     final token = 'TSV-${widget.session.id}-$code';
-    ApiService.instance.currentDynamicQrCode = token; // Lưu mã QR động toàn cục
+    ApiService.instance.broadcastNewQrToken(token); // Đồng bộ mã QR động lên Server/API
     setState(() {
       _currentToken = token;
       _secondsRemaining = 30;

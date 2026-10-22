@@ -66,4 +66,9 @@ namespace DiemDanh_TranHoangCongDang_2380614670_API.Dtos
         public string Status { get; set; } = "APPROVED"; // APPROVED, REJECTED
         public string? TeacherNote { get; set; }
     }
+
+    public class QrUpdateDto
+    {
+        public string Token { get; set; } = "";
+    }
 }

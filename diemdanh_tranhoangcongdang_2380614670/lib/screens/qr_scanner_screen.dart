@@ -25,6 +25,15 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
+    // Tự động đồng bộ mã QR mới nhất do Giảng viên phát từ PC
+    ApiService.instance.fetchActiveQrToken().then((latest) {
+      if (mounted) {
+        setState(() {
+          _manualCodeController.text = latest;
+        });
+      }
+    });
   }
 
   @override
@@ -118,7 +127,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
     );
   }
 
-  void _showQrCodeDialog() {
+  void _showQrCodeDialog() async {
+    final activeCode = await ApiService.instance.fetchActiveQrToken();
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -153,7 +164,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                 width: 170,
                 height: 170,
                 child: CustomPaint(
-                  painter: _QrMatrixPainter(seedString: 'DIEMDANH:1:${ApiService.instance.currentDynamicQrCode}'),
+                  painter: _QrMatrixPainter(seedString: 'DIEMDANH:1:$activeCode'),
                 ),
               ),
             ),
@@ -166,7 +177,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                 border: Border.all(color: Colors.blue.shade200),
               ),
               child: Text(
-                'Mã: ${ApiService.instance.currentDynamicQrCode}',
+                'Mã: $activeCode',
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blue),
               ),
             ),
@@ -183,8 +194,8 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
             label: const Text('Điểm danh ngay'),
             onPressed: () {
               Navigator.pop(ctx);
-              _manualCodeController.text = ApiService.instance.currentDynamicQrCode;
-              _processScan(ApiService.instance.currentDynamicQrCode);
+              _manualCodeController.text = activeCode;
+              _processScan(activeCode);
             },
           ),
         ],
@@ -296,11 +307,12 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                     label: Text(_isProcessing ? 'Đang xác thực điểm danh...' : 'QUÉT & ĐIỂM DANH MÃ QR HIỆN TẠI', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     onPressed: _isProcessing
                         ? null
-                        : () {
+                        : () async {
+                            final active = await ApiService.instance.fetchActiveQrToken();
                             setState(() {
-                              _manualCodeController.text = ApiService.instance.currentDynamicQrCode;
+                              _manualCodeController.text = active;
                             });
-                            _processScan(ApiService.instance.currentDynamicQrCode);
+                            _processScan(active);
                           },
                   ),
                   const SizedBox(height: 10),
@@ -347,10 +359,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                         onPressed: _isProcessing
                         ? null
                         : () {
-                            setState(() {
-                              _manualCodeController.text = ApiService.instance.currentDynamicQrCode;
-                            });
-                            _processScan(ApiService.instance.currentDynamicQrCode);
+                            final code = _manualCodeController.text.trim();
+                            if (code.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Vui lòng nhập mã QR của buổi học!')),
+                              );
+                              return;
+                            }
+                            _processScan(code);
                           },
                       ),
                     ],

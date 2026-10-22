@@ -96,7 +96,31 @@ namespace DiemDanh_TranHoangCongDang_2380614670_API.Controllers
     public class AttendanceController : ControllerBase
     {
         private readonly AppDbContext _db;
+        private static string _currentActiveQr = "TSV-1-K7X9A2";
+        private static DateTime _qrExpireTime = DateTime.UtcNow.AddMinutes(5);
+
         public AttendanceController(AppDbContext db) => _db = db;
+
+        [HttpGet("active-qr")]
+        public IActionResult GetActiveQr()
+        {
+            return Ok(new
+            {
+                Token = _currentActiveQr,
+                SecondsRemaining = Math.Max(0, (int)(_qrExpireTime - DateTime.UtcNow).TotalSeconds)
+            });
+        }
+
+        [HttpPost("set-qr")]
+        public IActionResult SetActiveQr([FromBody] QrUpdateDto dto)
+        {
+            if (!string.IsNullOrWhiteSpace(dto.Token))
+            {
+                _currentActiveQr = dto.Token.Trim();
+                _qrExpireTime = DateTime.UtcNow.AddSeconds(35);
+            }
+            return Ok(new { Token = _currentActiveQr });
+        }
 
         [HttpPost("checkin")]
         public async Task<IActionResult> CheckIn([FromBody] CheckInDto dto)

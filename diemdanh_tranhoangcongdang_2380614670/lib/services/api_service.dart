@@ -15,6 +15,35 @@ class ApiService {
   /// Mã QR động hiện tại do Giảng viên phát ra (đổi mỗi 30s)
   String currentDynamicQrCode = 'TSV-1-8K3N9Z';
 
+  /// Đồng bộ mã QR động lên Web API khi Giảng viên phát mã
+  Future<void> broadcastNewQrToken(String token) async {
+    currentDynamicQrCode = token;
+    try {
+      await http.post(
+        Uri.parse('${ApiConfig.currentBaseUrl}/Attendance/set-qr'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'token': token}),
+      ).timeout(const Duration(seconds: 3));
+    } catch (_) {}
+  }
+
+  /// Sinh viên tải mã QR động mới nhất mà Giảng viên đang phát trên PC
+  Future<String> fetchActiveQrToken() async {
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConfig.currentBaseUrl}/Attendance/active-qr'),
+      ).timeout(const Duration(seconds: 3));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        if (data['token'] != null && data['token'].toString().isNotEmpty) {
+          currentDynamicQrCode = data['token'].toString();
+          return currentDynamicQrCode;
+        }
+      }
+    } catch (_) {}
+    return currentDynamicQrCode;
+  }
+
   /// Bộ nhớ tạm lưu mã OTP random của từng tài khoản theo mỗi lượt đăng nhập
   final Map<String, String> _currentOtpMap = {};
 
