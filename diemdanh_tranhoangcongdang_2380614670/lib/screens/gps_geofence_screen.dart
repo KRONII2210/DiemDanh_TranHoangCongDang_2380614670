@@ -128,7 +128,7 @@ class _GpsGeofenceScreenState extends State<GpsGeofenceScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chia Sẻ Vị Trí & GPS (5b)'),
+        title: const Text('Chia Sẻ Vị Trí & Radar GPS'),
         backgroundColor: Colors.red.shade800,
         foregroundColor: Colors.white,
       ),

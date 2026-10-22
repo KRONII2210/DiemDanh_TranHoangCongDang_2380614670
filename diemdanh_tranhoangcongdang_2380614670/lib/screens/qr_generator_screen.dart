@@ -65,7 +65,7 @@ class _QrGeneratorScreenState extends State<QrGeneratorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mã QR Điểm Danh Động (5e)'),
+        title: const Text('Mã QR Điểm Danh Động'),
         backgroundColor: Colors.blue.shade800,
         foregroundColor: Colors.white,
       ),

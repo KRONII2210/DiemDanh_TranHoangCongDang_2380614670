@@ -129,7 +129,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isLecturer ? 'Xét Duyệt Đơn Nghỉ Phép' : 'Đơn Nghỉ Phép & Minh Chứng (1đ)'),
+        title: Text(widget.isLecturer ? 'Xét Duyệt Đơn Nghỉ Phép' : 'Đơn Nghỉ Phép & Minh Chứng'),
         backgroundColor: Colors.amber.shade800,
         foregroundColor: Colors.white,
       ),

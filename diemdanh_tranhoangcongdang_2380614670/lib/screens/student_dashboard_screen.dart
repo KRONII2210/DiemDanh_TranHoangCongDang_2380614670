@@ -185,21 +185,21 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           icon: Icons.qr_code_scanner,
                           color: Colors.blue.shade700,
                           title: 'Điểm Danh QR',
-                          subtitle: 'Quét mã QR từ Giảng viên (5e)',
+                          subtitle: 'Quét mã QR từ Giảng viên',
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QrScannerScreen())),
                         ),
                         _buildFeatureCard(
                           icon: Icons.share_location,
                           color: Colors.red.shade700,
                           title: 'Vị Trí GPS',
-                          subtitle: 'Chia sẻ vị trí & Radar (5b)',
+                          subtitle: 'Chia sẻ vị trí & Radar phòng',
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GpsGeofenceScreen())),
                         ),
                         _buildFeatureCard(
                           icon: Icons.face_retouching_natural,
                           color: Colors.purple.shade700,
                           title: 'Face ID',
-                          subtitle: 'Xác thực khuôn mặt (5a)',
+                          subtitle: 'Xác thực sinh trắc học',
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(

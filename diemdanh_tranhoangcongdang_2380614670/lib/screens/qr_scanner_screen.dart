@@ -121,7 +121,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quét Mã QR Điểm Danh (5e)'),
+        title: const Text('Quét Mã QR Điểm Danh'),
         backgroundColor: Colors.blue.shade800,
         foregroundColor: Colors.white,
       ),
@@ -272,11 +272,11 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('TÍCH HỢP ĐỒNG THỜI 3 CHỨC NĂNG:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.blue)),
+                        Text('QUY TRÌNH XÁC THỰC 3 LỚP AN TOÀN:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.blue)),
                         SizedBox(height: 4),
-                        Text('1. Nhận diện QR Code bảo mật (5e)', style: TextStyle(fontSize: 12)),
-                        Text('2. Kiểm tra tọa độ GPS trong bán kính phòng học (5b)', style: TextStyle(fontSize: 12)),
-                        Text('3. Xác thực sinh viên Trần Hoàng Công Đăng - 2380614670 (5a)', style: TextStyle(fontSize: 12)),
+                        Text('1. Nhận diện QR Code bảo mật thời gian thực', style: TextStyle(fontSize: 12)),
+                        Text('2. Đối soát tọa độ GPS trong bán kính phòng học', style: TextStyle(fontSize: 12)),
+                        Text('3. Xác thực danh tính sinh viên Trần Hoàng Công Đăng - 2380614670', style: TextStyle(fontSize: 12)),
                       ],
                     ),
                   ),

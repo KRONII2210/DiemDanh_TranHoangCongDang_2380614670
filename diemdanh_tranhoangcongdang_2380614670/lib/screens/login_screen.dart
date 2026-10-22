@@ -80,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Icon(Icons.mark_email_read, color: Colors.indigo),
                 SizedBox(width: 8),
-                Text('Mã OTP Mới (Đổi Mỗi Lượt)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Mã Xác Thực OTP', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
             content: Column(
@@ -101,14 +101,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text('Mã OTP được hệ thống sinh ngẫu nhiên và sẽ đổi mới ở mỗi lượt đăng nhập.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.black54)),
+                const Text('Mã xác thực OTP có hiệu lực trong 5 phút. Vui lòng nhập mã để hoàn tất đăng nhập an toàn.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.black54)),
               ],
             ),
             actions: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Nhập Mã & Đăng Nhập'),
+                child: const Text('Nhập Mã & Tiếp Tục'),
               ),
             ],
           ),
@@ -211,43 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(fontSize: 13, color: Colors.black54, fontWeight: FontWeight.w600),
                 ),
               ),
-              const SizedBox(height: 20),
-
-              // NÚT TRẢI NGHIỆM TRỰC TIẾP TOÀN BỘ ỨNG DỤNG
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal.shade700,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                ),
-                icon: const Icon(Icons.rocket_launch_rounded),
-                label: const Text('VÀO THẲNG DASHBOARD SINH VIÊN (1-CHẠM)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                onPressed: () {
-                  _navigateToRoleDashboard(UserModel(
-                    id: 1,
-                    username: 'sv_dang',
-                    email: 'dang.thc@diemdanh.local',
-                    fullName: 'Trần Hoàng Công Đăng',
-                    role: 'SINH_VIEN',
-                    mssv: '2380614670',
-                  ));
-                },
-              ),
-              const SizedBox(height: 16),
-
-              const Row(
-                children: [
-                  Expanded(child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text('HOẶC ĐĂNG NHẬP OTP 2 BƯỚC', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
-                  ),
-                  Expanded(child: Divider()),
-                ],
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
               // BƯỚC 1: NHẬP TÊN ĐĂNG NHẬP & MẬT KHẨU
               if (!_showOtpStep) ...[
@@ -321,13 +285,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             border: Border.all(color: Colors.amber.shade400),
                           ),
                           child: Text(
-                            '🔐 MÃ OTP RANDOM: $_generatedOtpDemo',
+                            'Mã OTP của bạn: $_generatedOtpDemo',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.brown.shade900),
                           ),
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          '(Mã sinh ngẫu nhiên và tự động đổi mới sau mỗi lượt đăng nhập)',
+                          '(Mã bảo mật gửi đến email đăng ký của bạn)',
                           style: TextStyle(fontSize: 10, color: Colors.black54),
                         ),
                       ],
@@ -438,12 +402,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 20),
 
-              // PHÍM TẮT ĐĂNG NHẬP CHUẨN CỦA NHÓM TSV
+              // Gợi ý đăng nhập nhanh các vai trò
               const Divider(),
               const SizedBox(height: 6),
               const Center(
                 child: Text(
-                  '⚡ Phím tắt chọn nhanh tài khoản API chung của nhóm:',
+                  'Chọn nhanh vai trò đăng nhập:',
                   style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold),
                 ),
               ),
