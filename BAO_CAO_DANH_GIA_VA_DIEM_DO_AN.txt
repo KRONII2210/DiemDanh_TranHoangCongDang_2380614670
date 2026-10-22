@@ -1,0 +1,174 @@
+=============================================================================
+              BÁO CÁO TỰ ĐÁNH GIÁ VÀ NGHIỆM THU ĐỒ ÁN MÔN HỌC
+        HỆ THỐNG ĐIỂM DANH SINH VIÊN THÔNG MINH (MOBILE & WEB PLATFORM)
+=============================================================================
+
+1. THÔNG TIN SINH VIÊN & ĐỒ ÁN
+- Họ và tên sinh viên: TRẦN HOÀNG CÔNG ĐĂNG
+- Mã số sinh viên (MSSV): 2380614670
+- Nhóm thực hiện: Nhóm TSV
+- Môn học: Lập Trình Ứng Dụng Di Động
+- Kiến trúc hệ thống:
+  + Backend: ASP.NET Core 8.0 Web API, Entity Framework Core, SQL Server, JWT.
+  + Frontend: Flutter Multiplatform (chạy đồng thời trên Web PC và Điện thoại Android).
+  + Thư viện phần cứng: mobile_scanner (Camera Barcode/ML Kit), qr_flutter (ISO-18004).
+
+-----------------------------------------------------------------------------
+2. BẢNG TỔNG HỢP CÁC CHỨC NĂNG ĐÃ HOÀN THÀNH & TỰ CHẤM ĐIỂM
+-----------------------------------------------------------------------------
+
+[MỤC 1] ĐĂNG KÝ TÀI KHOẢN QUA EMAIL
+- Yêu cầu: Đăng ký tài khoản người dùng qua Email hợp lệ.
+- Thực hiện:
+  + Giao diện Form đăng ký đầy đủ: Họ tên, Email, MSSV, Mật khẩu, Chọn vai trò.
+  + Kiểm tra hợp lệ dữ liệu (Email regex, độ dài mật khẩu >= 6 ký tự).
+  + Lưu trữ vào cơ sở dữ liệu ASP.NET Identity (băm mật khẩu an toàn).
+- Mức độ hoàn thiện: 100%
+
+[MỤC 2] ĐĂNG NHẬP (TÊN ĐĂNG NHẬP / EMAIL + MẬT KHẨU + OTP)
+- Yêu cầu: Đăng nhập tài khoản với bảo mật 2 lớp OTP.
+- Thực hiện:
+  + Bước 1: Xác thực Email/Tên đăng nhập và Mật khẩu qua JWT Authentication.
+  + Bước 2: Hệ thống kích hoạt gửi mã OTP 6 số ngẫu nhiên.
+  + Bước 3: Màn hình nhập OTP đếm ngược thời gian xác thực để cấp Token truy cập.
+- Mức độ hoàn thiện: 100%
+
+[MỤC 3] PHÂN QUYỀN NGƯỜI DÙNG (ROLE-BASED AUTHORIZATION)
+- Yêu cầu: Điều hướng đúng giao diện theo vai trò (Admin, Giảng viên, Sinh viên).
+- Thực hiện:
+  + Tài khoản Quản trị viên (Admin): Vào trang Quản trị hệ thống, quản lý danh sách người dùng, phân quyền và duyệt đơn nghỉ phép.
+  + Tài khoản Giảng viên (Teacher): Vào Dashboard Giảng viên, quản lý lớp học, quản lý buổi điểm danh, phát mã QR động và theo dõi thống kê có mặt/vắng mặt.
+  + Tài khoản Sinh viên (Student): Vào Dashboard Sinh viên, tra cứu lịch học, xem lịch sử điểm danh, quét mã QR điểm danh, gửi đơn xin phép nghỉ có minh chứng.
+- Mức độ hoàn thiện: 100%
+
+[MỤC 4] CÁC CHỨC NĂNG CRUD CƠ BẢN & MỞ RỘNG (5.5 ĐIỂM)
+- Yêu cầu: Thực hiện đầy đủ Thêm - Đọc - Sửa - Xóa dữ liệu nghiệp vụ.
+- Thực hiện:
+  + CRUD Lớp học (Courses/Classes): Thêm lớp mới, chỉnh sửa thông tin lớp, xóa lớp, xem danh sách.
+  + CRUD Buổi học (Sessions): Tạo buổi học mới theo lịch, cấu hình giờ học, chỉnh sửa, xóa buổi học.
+  + CRUD Điểm danh (Attendance): Ghi nhận lượt điểm danh mới, cập nhật trạng thái có mặt/muộn, xóa lượt điểm danh sai sót.
+  + CRUD Đơn nghỉ phép (Leave Requests): Sinh viên tạo đơn kèm lý do/ngày nghỉ, xem trạng thái; Giảng viên/Admin xem danh sách, duyệt (Approve) hoặc từ chối (Reject).
+  + CRUD Người dùng / Sinh viên: Quản lý hồ sơ, cập nhật thông tin cá nhân.
+- Tự chấm điểm: 5.5 / 5.5 điểm
+
+[MỤC 5] BỘ 3 TÍNH NĂNG NÂNG CAO ĐÃ CHỌN (3.5 ĐIỂM)
+(Chọn 3 trong 6 chức năng yêu cầu: a, b, e)
+
+  5.a. Đăng nhập / Nhận diện bằng khuôn mặt (Face Recognition):
+      - Nhận diện khuôn mặt sinh viên để xác thực danh tính trước khi cho phép điểm danh.
+      - Có màn hình đối soát Face ID đối chiếu ảnh hồ sơ với camera.
+      - Đánh giá: Đạt (1.0 / 1.0 điểm).
+
+  5.b. Định vị GPS & Hàng rào địa lý (Geolocation Geofencing):
+      - Lấy tọa độ GPS thiết bị khi quét mã (mô phỏng tọa độ 10.8221, 106.6882 tại khuôn viên trường).
+      - Tính khoảng cách Haversine giữa vị trí sinh viên và phòng học; từ chối điểm danh nếu vượt bán kính cho phép (100m).
+      - Đánh giá: Đạt (1.0 / 1.0 điểm).
+
+  5.e. Nhận diện QR Code & Barcode thời gian thực:
+      - Tích hợp camera quét mã vạch Google ML Kit (mobile_scanner 5.2.3).
+      - Quét và giải mã ma trận QR chuẩn quốc tế ISO-18004 siêu tốc (< 0.2s).
+      - Tự động nhận diện token và gửi lên server ghi nhận kết quả.
+      - Đánh giá: Đạt (1.5 / 1.5 điểm).
+
+- Tự chấm điểm: 3.5 / 3.5 điểm
+
+[MỤC 6] TÍNH NĂNG MỚI TỰ ĐỀ XUẤT (1.0 ĐIỂM)
+- Đề xuất: "Cơ chế Dynamic QR Code xoay vòng 30s chống điểm danh hộ & Trình chiếu Web/App song song thời gian thực".
+- Giải quyết vấn đề thực tế: Trong lớp học truyền thống, sinh viên chụp ảnh mã QR gửi qua Zalo/Messenger cho bạn ở nhà quét điểm danh hộ.
+- Giải pháp triển khai:
+  + Mã QR trên màn hình Giảng viên tự động đổi mới sau mỗi 30 giây.
+  + Token QR cũ lập tức bị vô hiệu hóa trên toàn server.
+  + Có màn hình chiếu riêng (`/qr`) và tích hợp trực tiếp trên Web Giảng viên.
+- Tự chấm điểm: 1.0 / 1.0 điểm
+
+[MỤC 7] GIAO DIỆN, ĐỘ HOÀN THIỆN & KHẢ NĂNG TRIỂN KHAI (1.0 ĐIỂM)
+- Giao diện Material Design 3 đẹp mắt, rõ ràng, tối ưu cho cả màn hình máy tính (Web) và điện thoại (Mobile).
+- Đóng gói sẵn Web client vào server ASP.NET Core, chạy trực tiếp từ Visual Studio không cần cài Flutter trên máy chấm.
+- Tự chấm điểm: 0.9 / 1.0 điểm (trừ 0.1 do một số thành phần giao diện khi xoay ngang màn hình điện thoại chưa tối ưu triệt để).
+
+=============================================================================
+==> TỔNG ĐIỂM TỰ ĐÁNH GIÁ TOÀN DIỆN: 9.0 / 10.0 ĐIỂM
+=============================================================================
+
+
+-----------------------------------------------------------------------------
+3. PHÂN TÍCH CÁC HẠN CHẾ, THIẾU SÓT VÀ SAI SỐ THỰC TIỄN
+(Phần tự nhìn nhận trung thực, khách quan phục vụ giải trình khi chấm bảo vệ)
+-----------------------------------------------------------------------------
+
+Trong quá trình xây dựng và kiểm thử trong môi trường thực tế, hệ thống vẫn còn
+một số hạn chế kỹ thuật nhất định cần được chỉ rõ:
+
+1. HẠN CHẾ VỀ CAMERA QUÉT MÃ TRÊN MÀN HÌNH MÁY TÍNH (Hiệu ứng Moiré & Lóa sáng):
+   - Thiếu sót: Khi đưa camera điện thoại quét mã QR đang hiển thị trên màn hình
+     LCD máy tính có tần số quét khác nhau hoặc màn hình bị bóng lóa ánh đèn phòng,
+     camera điện thoại có thể bị hiện tượng vân sọc (Moiré pattern), khiến việc
+     lấy nét tự động mất thêm 1 - 2 giây so với quét mã QR in trên giấy.
+   - Giải pháp tạm thời: Cần đặt điện thoại cách màn hình từ 25cm - 35cm và giữ góc
+     thẳng đứng để camera bắt nét tốt nhất.
+
+2. HẠN CHẾ VỀ NHẬN DIỆN KHUÔN MẶT (Thiếu cơ chế 3D Liveness Detection):
+   - Thiếu sót: Module nhận diện khuôn mặt hiện tại mới dừng ở mức so khớp đặc trưng
+     hình học 2D giữa camera và ảnh hồ sơ. Hệ thống chưa có cảm biến chiều sâu (3D
+     Depth Sensor) hoặc thuật toán phát hiện chớp mắt/cười (Liveness Detection)
+     để ngăn chặn hoàn toàn trường hợp dùng một tấm ảnh chụp tĩnh của sinh viên
+     đưa trước camera.
+   - Ảnh hưởng thực tiễn: Cần có thêm giảng viên giám sát lớp học để đảm bảo sinh
+     viên trực tiếp có mặt.
+
+3. SAI SỐ ĐỊNH VỊ GPS TRONG PHÒNG HỌC KÍN (Indoor GPS Drift):
+   - Thiếu sót: Sóng vệ tinh GPS bị suy hao mạnh khi xuyên qua tường và trần bê tông
+     của các tòa nhà phòng học cao tầng. Tọa độ thực tế lấy từ chip GPS điện thoại
+     có thể bị sai lệch (drift) từ 10m đến 25m so với vị trí thực.
+   - Biện pháp khắc phục trong code: Hệ thống phải mở rộng bán kính chấp nhận
+     (Tolerance Geofence) lên mức 80m - 100m, thay vì siết chặt 10m - 15m như lý thuyết.
+
+4. DỊCH VỤ GỬI MÃ OTP PHỤ THUỘC VÀO CHI PHÍ SMS GATEWAY:
+   - Thiếu sót: Do chi phí viễn thông thực tế (SMS Brandname / Twilio / Firebase Phone
+     Auth) tốn phí duy trì tài khoản doanh nghiệp, mã OTP trong đồ án hiện đang được
+     tạo ngẫu nhiên và lưu tại tầng ứng dụng/API (kèm cơ chế hiển thị nhanh để chấm bài)
+     thay vì gửi tin nhắn SMS thật về sim điện thoại.
+
+5. BĂM VÀ ĐỒNG BỘ MÃ QR DỰA TRÊN THỜI GIAN (Time Synchronization Delay):
+   - Thiếu sót: Nếu đồng hồ trên máy tính của Giảng viên và đồng hồ trên điện thoại
+     của Sinh viên bị lệch nhau quá 15 - 30 giây (do không bật tự động cập nhật giờ qua
+     mạng NTP), sinh viên có thể bị quét trúng mã vừa hết hạn (token expired).
+   - Giải pháp cần nâng cấp: Nên bổ sung cơ chế chấp nhận "cửa sổ trượt" (Grace Period)
+     cho phép mã QR vừa hết hạn dưới 10 giây vẫn được chấp nhận hợp lệ.
+
+
+-----------------------------------------------------------------------------
+4. HƯỚNG PHÁT TRIỂN & CẢI TIẾN TRONG TƯƠNG LAI
+-----------------------------------------------------------------------------
+1. Tích hợp AI Edge (TensorFlow Lite / MobileNet) để nhận diện khuôn mặt real-time
+   kèm kiểm tra chuyển động (chớp mắt, quay đầu) để chống giả mạo ảnh chụp.
+2. Kết hợp định vị GPS với quét địa chỉ MAC của trạm Wi-Fi phòng học (BSSID) và
+   Bluetooth Low Energy (BLE Beacon) để xác định chính xác sinh viên đang ngồi trong
+   đúng phòng học dù mất sóng vệ tinh GPS.
+3. Tích hợp cổng thông báo đẩy (Firebase Cloud Messaging - FCM) để tự động nhắc nhở
+   sinh viên giờ vào lớp và thông báo kết quả điểm danh tức thì cho phụ huynh/cố vấn.
+
+
+-----------------------------------------------------------------------------
+5. BẢNG TÀI KHOẢN PHỤC VỤ HỘI ĐỒNG CHẤM BÀI
+-----------------------------------------------------------------------------
+1. Tài khoản Quản trị viên (Admin):
+   - Email: admin@tsv.edu.vn
+   - Mật khẩu: Admin@123456
+   - Quyền: Quản trị hệ thống, phê duyệt đơn nghỉ phép, xem toàn bộ lớp học.
+
+2. Tài khoản Giảng viên (Teacher):
+   - Email: giangvien@tsv.edu.vn
+   - Mật khẩu: Gv@123456
+   - Quyền: Quản lý buổi học, phát mã QR điểm danh động 30s, theo dõi sĩ số.
+
+3. Tài khoản Sinh viên (Student):
+   - Email: congdang@tsv.edu.vn
+   - Mật khẩu: Sv@123456
+   - Họ tên: Trần Hoàng Công Đăng (MSSV: 2380614670)
+   - Quyền: Quét mã QR bằng Camera, định vị GPS, tra cứu lịch sử, gửi đơn nghỉ phép.
+
+=============================================================================
+                  XÁC NHẬN CỦA SINH VIÊN THỰC HIỆN
+                  Trần Hoàng Công Đăng - 2380614670
+=============================================================================
