@@ -72,15 +72,30 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseCors("AllowAll");
+
+// Phục vụ giao diện Web Điểm danh trực tiếp từ root (bỏ qua bước trung gian Swagger)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+var flutterWebPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "diemdanh_tranhoangcongdang_2380614670", "build", "web"));
+if (Directory.Exists(flutterWebPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(flutterWebPath),
+        RequestPath = ""
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Tự động chuyển hướng trang chủ (/) vào trang Swagger UI để không bao giờ bị lỗi 404
-app.MapGet("/", () => Results.Redirect("/swagger"));
-
 // Màn hình chiếu phát mã QR động của Giảng viên (Truy cập trên máy tính để điện thoại quét mã)
 app.MapGet("/qr", () => Results.Content(QrWebPage.GetHtml(), "text/html"));
+
+// SPA Fallback về index.html của Web App Điểm danh
+app.MapFallbackToFile("index.html");
 
 // Nạp dữ liệu mẫu ban đầu
 using (var scope = app.Services.CreateScope())

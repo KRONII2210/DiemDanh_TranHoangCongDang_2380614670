@@ -3,20 +3,20 @@
     "DiemDanh_TranHoangCongDang_2380614670_API": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchUrl": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:59529;http://0.0.0.0:5080;http://localhost:59530"
+      "applicationUrl": "http://localhost:5080;http://0.0.0.0:5080"
     },
     "http": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchUrl": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://0.0.0.0:5080;http://localhost:59530"
+      "applicationUrl": "http://localhost:5080;http://0.0.0.0:5080"
     }
   }
 }

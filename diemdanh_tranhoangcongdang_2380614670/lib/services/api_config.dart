@@ -9,11 +9,19 @@ import 'package:flutter/foundation.dart';
 
 class ApiConfig {
   /// Tự động nhận diện nền tảng:
-  /// - Chạy trên PC / Trình duyệt Web (Edge/Chrome): kết nối "http://localhost:5080/api"
-  /// - Chạy trên Điện thoại / Giả lập Android: kết nối "http://10.0.2.2:5080/api"
+  /// - Chạy trên PC / Trình duyệt Web (Edge/Chrome): tự động nhận diện theo domain/port máy chủ
+  /// - Chạy trên Điện thoại (USB/adb reverse): kết nối "http://localhost:5080/api"
   static String get defaultUrl {
-    if (kIsWeb) return "http://localhost:5080/api";
-    return "http://10.0.2.2:5080/api";
+    if (kIsWeb) {
+      try {
+        final origin = Uri.base.origin;
+        if (origin.isNotEmpty && !origin.startsWith('file:') && origin != 'null') {
+          return "$origin/api";
+        }
+      } catch (_) {}
+      return "http://localhost:5080/api";
+    }
+    return "http://localhost:5080/api";
   }
 
   static String sharedApiUrl = defaultUrl;
