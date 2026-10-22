@@ -1,3 +1,8 @@
+# Gradle & Android Build Caches
+.gradle/
+**/.gradle/
+**/build/
+
 # Visual Studio / .NET
 [Bb]in/
 [Oo]bj/
@@ -8,15 +13,21 @@
 *.sln.docstates
 
 # Flutter / Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
 diemdanh_tranhoangcongdang_2380614670/.dart_tool/
 diemdanh_tranhoangcongdang_2380614670/build/
 diemdanh_tranhoangcongdang_2380614670/.flutter-plugins
 diemdanh_tranhoangcongdang_2380614670/.flutter-plugins-dependencies
 
-# Android Studio
-diemdanh_tranhoangcongdang_2380614670/.idea/workspace.xml
-diemdanh_tranhoangcongdang_2380614670/.idea/caches/
+# Android Studio / IntelliJ
+.idea/
+**/.idea/
+*.iml
 
 # Windows
 Thumbs.db
 Desktop.ini
+
