@@ -155,7 +155,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('HỆ THỐNG CẢNH BÁO CẤM THI AI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green)),
+                                Text('THEO DÕI CHUYÊN CẦN & CẢNH BÁO CẤM THI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green)),
                                 SizedBox(height: 2),
                                 Text(
                                   'Tỷ lệ vắng: 0% / Tối đa 20% cho phép.\nTrạng thái: AN TOÀN - Đủ điều kiện dự thi cuối kỳ!',
@@ -170,7 +170,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                     const SizedBox(height: 20),
 
                     // Feature Grid (3 core presentation features + Novel feature)
-                    const Text('3 CHỨC NĂNG THUYẾT TRÌNH & TÍNH NĂNG MỚI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blueGrey)),
+                    const Text('CHỨC NĂNG CHÍNH', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blueGrey)),
                     const SizedBox(height: 12),
 
                     GridView.count(
@@ -223,7 +223,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                           icon: Icons.assignment_turned_in,
                           color: Colors.amber.shade800,
                           title: 'Đơn Nghỉ Phép',
-                          subtitle: 'Gửi minh chứng + AI (Tính năng mới)',
+                          subtitle: 'Nộp đơn & minh chứng y tế',
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(builder: (_) => const LeaveRequestScreen(lopId: 1, isLecturer: false)),

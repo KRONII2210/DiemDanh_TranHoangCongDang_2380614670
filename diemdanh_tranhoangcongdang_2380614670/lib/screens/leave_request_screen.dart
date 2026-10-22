@@ -157,7 +157,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                             const SizedBox(width: 8),
                             const Expanded(
                               child: Text(
-                                'TÍNH NĂNG ĐỀ XUẤT MỚI: AI CẢNH BÁO NGUY CƠ CẤM THI',
+                                'QUY ĐỊNH CHUYÊN CẦN & NGHỈ PHÉP',
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.brown),
                               ),
                             ),

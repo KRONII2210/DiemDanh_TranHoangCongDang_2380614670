@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/session_model.dart';
 import '../services/api_service.dart';
@@ -117,6 +118,80 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
     );
   }
 
+  void _showQrCodeDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.qr_code_2, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Mã QR Của Buổi Học', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Lớp: LTDD01 - Lập trình di động\nBuổi học: Buổi 1 (Mã đổi mỗi 30s)',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, color: Colors.black87),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+                ],
+              ),
+              child: SizedBox(
+                width: 170,
+                height: 170,
+                child: CustomPaint(
+                  painter: _QrMatrixPainter(seedString: 'DIEMDANH:1:${ApiService.instance.currentDynamicQrCode}'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Text(
+                'Mã: ${ApiService.instance.currentDynamicQrCode}',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Đóng'),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue.shade800, foregroundColor: Colors.white),
+            icon: const Icon(Icons.check_circle_outline, size: 18),
+            label: const Text('Điểm danh ngay'),
+            onPressed: () {
+              Navigator.pop(ctx);
+              _manualCodeController.text = ApiService.instance.currentDynamicQrCode;
+              _processScan(ApiService.instance.currentDynamicQrCode);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,6 +199,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
         title: const Text('Quét Mã QR Điểm Danh'),
         backgroundColor: Colors.blue.shade800,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_2),
+            tooltip: 'Xem mã QR buổi học (Dành cho kiểm thử 1 máy)',
+            onPressed: _showQrCodeDialog,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -211,7 +293,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                     icon: _isProcessing
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                         : const Icon(Icons.qr_code_scanner),
-                    label: Text(_isProcessing ? 'Đang xác thực điểm danh...' : 'QUÉT MÃ QR TỰ ĐỘNG NGAY', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    label: Text(_isProcessing ? 'Đang xác thực điểm danh...' : 'QUÉT & ĐIỂM DANH MÃ QR HIỆN TẠI', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     onPressed: _isProcessing
                         ? null
                         : () {
@@ -220,6 +302,19 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
                             });
                             _processScan(ApiService.instance.currentDynamicQrCode);
                           },
+                  ),
+                  const SizedBox(height: 10),
+
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.blue.shade900,
+                      side: BorderSide(color: Colors.blue.shade300, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    icon: const Icon(Icons.qr_code_2_rounded),
+                    label: const Text('HIỂN THỊ MÃ QR BUỔI HỌC (TEST 1 MÁY)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    onPressed: _showQrCodeDialog,
                   ),
                   const SizedBox(height: 16),
 
@@ -288,4 +383,62 @@ class _QrScannerScreenState extends State<QrScannerScreen> with SingleTickerProv
       ),
     );
   }
+}
+
+class _QrMatrixPainter extends CustomPainter {
+  final String seedString;
+  _QrMatrixPainter({required this.seedString});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paintDark = Paint()..color = const Color(0xFF1A237E);
+    final paintFinder = Paint()..color = const Color(0xFF0D47A1);
+
+    const int grid = 25;
+    final cellSize = size.width / grid;
+
+    void drawFinder(double x, double y) {
+      canvas.drawRect(Rect.fromLTWH(x * cellSize, y * cellSize, 7 * cellSize, 7 * cellSize), paintFinder);
+      canvas.drawRect(
+        Rect.fromLTWH((x + 1) * cellSize, (y + 1) * cellSize, 5 * cellSize, 5 * cellSize),
+        Paint()..color = Colors.white,
+      );
+      canvas.drawRect(Rect.fromLTWH((x + 2) * cellSize, (y + 2) * cellSize, 3 * cellSize, 3 * cellSize), paintFinder);
+    }
+
+    drawFinder(1, 1);
+    drawFinder(grid - 8.0, 1);
+    drawFinder(1, grid - 8.0);
+
+    int hash = seedString.hashCode;
+    final rand = Random(hash.abs());
+
+    for (int r = 0; r < grid; r++) {
+      for (int c = 0; c < grid; c++) {
+        if ((r < 9 && c < 9) || (r < 9 && c >= grid - 9) || (r >= grid - 9 && c < 9)) {
+          continue;
+        }
+
+        if (r == 6 || c == 6) {
+          if ((r + c) % 2 == 0) {
+            canvas.drawRect(Rect.fromLTWH(c * cellSize, r * cellSize, cellSize, cellSize), paintDark);
+          }
+          continue;
+        }
+
+        if (rand.nextBool()) {
+          canvas.drawRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromLTWH(c * cellSize + 0.5, r * cellSize + 0.5, cellSize - 1, cellSize - 1),
+              const Radius.circular(1.5),
+            ),
+            paintDark,
+          );
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _QrMatrixPainter oldDelegate) => oldDelegate.seedString != seedString;
 }

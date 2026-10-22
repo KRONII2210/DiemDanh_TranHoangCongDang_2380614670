@@ -5,7 +5,7 @@ import 'login_screen.dart';
 import 'crud_class_screen.dart';
 import 'crud_student_screen.dart';
 import 'summary_screen.dart';
-import 'about_screen.dart';
+import 'leave_request_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
@@ -32,11 +32,6 @@ class AdminDashboardScreen extends StatelessWidget {
             icon: const Icon(Icons.settings_ethernet),
             tooltip: 'Cấu hình Web API',
             onPressed: () => ServerConfigDialog.show(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: 'Thông tin nhóm TSV',
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -80,13 +75,13 @@ class AdminDashboardScreen extends StatelessWidget {
                           style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          user?.fullName ?? 'Quản Trị Viên TSV',
+                          user?.fullName ?? 'Quản Trị Viên Hệ Thống',
                           style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Nhóm TSV | SV: Trần Hoàng Công Đăng (2380614670)',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
+                          'Tài khoản Quản trị cấp cao (Toàn quyền quản lý)',
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     ),
@@ -97,7 +92,7 @@ class AdminDashboardScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             const Text(
-              'CHỨC NĂNG QUẢN LÝ DỮ LIỆU (CRUD)',
+              'CHỨC NĂNG QUẢN LÝ HỆ THỐNG',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.indigo),
             ),
             const SizedBox(height: 12),
@@ -145,11 +140,14 @@ class AdminDashboardScreen extends StatelessWidget {
                 Expanded(
                   child: _buildAdminCard(
                     context,
-                    title: 'Thông Tin Đồ Án',
-                    subtitle: 'Nhóm TSV - Đăng 2380614670',
-                    icon: Icons.badge,
-                    color: Colors.orange.shade800,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                    title: 'Duyệt Đơn Nghỉ Phép',
+                    subtitle: 'Xét duyệt đơn xin nghỉ',
+                    icon: Icons.assignment_turned_in,
+                    color: Colors.amber.shade800,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LeaveRequestScreen(lopId: 1, isLecturer: true)),
+                    ),
                   ),
                 ),
               ],
@@ -166,9 +164,9 @@ class AdminDashboardScreen extends StatelessWidget {
                   children: [
                     const Text('Tổng quan dữ liệu toàn hệ thống', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     const Divider(height: 20),
-                    _buildStatRow('Môn học:', 'LTDD01 (Lập trình di động), CSDL02'),
-                    _buildStatRow('Sinh viên đại diện:', 'Trần Hoàng Công Đăng (2380614670)'),
-                    _buildStatRow('Trạng thái kết nối API:', 'Sẵn sàng'),
+                    _buildStatRow('Môn học đang quản lý:', 'LTDD01 (Lập trình di động), CSDL02'),
+                    _buildStatRow('Tổng số sinh viên:', '4 sinh viên'),
+                    _buildStatRow('Trạng thái kết nối API:', 'Đang hoạt động'),
                   ],
                 ),
               ),

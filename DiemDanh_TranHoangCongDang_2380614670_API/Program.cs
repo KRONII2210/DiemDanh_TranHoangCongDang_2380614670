@@ -79,6 +79,9 @@ app.MapControllers();
 // Tự động chuyển hướng trang chủ (/) vào trang Swagger UI để không bao giờ bị lỗi 404
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
+// Màn hình chiếu phát mã QR động của Giảng viên (Truy cập trên máy tính để điện thoại quét mã)
+app.MapGet("/qr", () => Results.Content(QrWebPage.GetHtml(), "text/html"));
+
 // Nạp dữ liệu mẫu ban đầu
 using (var scope = app.Services.CreateScope())
 {
