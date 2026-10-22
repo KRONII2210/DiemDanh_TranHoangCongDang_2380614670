@@ -15,6 +15,7 @@
 # Flutter / Dart
 .dart_tool/
 build/
+.metadata
 .flutter-plugins
 .flutter-plugins-dependencies
 diemdanh_tranhoangcongdang_2380614670/.dart_tool/
